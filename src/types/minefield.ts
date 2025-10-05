@@ -8,14 +8,18 @@ export type Minefield = {
 };
 
 export type Tile = {
+  /** A unique key for this tile. */
   key: string;
+  /** This tile's X position. */
   x: number;
+  /** This tile's Y position. */
   y: number;
+  /** Whether this tile is revealed. */
   revealed: boolean;
+  /** Whether this tile has a mine. */
   mine: boolean;
+  /** Whether this tile has a flag on it. */
   flag: boolean;
-  adjacentTiles: Tile[];
-  adjacentMines: number;
 };
 
 function makeTile(overrides: Partial<Tile> & { x: number; y: number }): Tile {
@@ -24,8 +28,6 @@ function makeTile(overrides: Partial<Tile> & { x: number; y: number }): Tile {
     revealed: false,
     mine: false,
     flag: false,
-    adjacentMines: 0,
-    adjacentTiles: [],
     ...overrides,
   };
 }
@@ -77,7 +79,7 @@ export function getTile(
   return [tile, index];
 }
 
-export function getAdjacentTiles(tile: Tile, field: Minefield) {
+export function getAdjacentTiles(tile: Vec2, field: Minefield) {
   const found: Tile[] = [];
   for (const diff of ADJACENT_COORDS) {
     const adjacentCoord = {

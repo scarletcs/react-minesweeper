@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, type MouseEvent } from "react";
 import { useMinefield } from "../providers/MinefieldProvider/context";
 import { getAdjacentTiles, type Tile } from "../types/minefield";
 import styles from "./TileView.module.scss";
@@ -10,32 +10,50 @@ type Props = {
 
 export default function TileView({ tile }: Props) {
   const [minefield, dispatch] = useMinefield();
+  const { x, y, revealed, flag } = tile;
 
+  /** List of adjacent tiles */
   const adjacentTiles = useMemo(
-    () => getAdjacentTiles(tile, minefield),
-    [tile, minefield]
+    () => getAdjacentTiles({ x, y }, minefield),
+    [x, y, minefield]
   );
 
+  /** Number of adjacent mines */
   const adjacentMines = useMemo(
     () => adjacentTiles.filter((t) => t.mine).length,
     [adjacentTiles]
   );
 
   const handleClick = useCallback(() => {
-    dispatch({ type: "reveal_tile", payload: { x: tile.x, y: tile.y } });
-  }, [dispatch, tile.x, tile.y]);
+    if (!revealed && !flag) {
+      dispatch({ type: "reveal_tile", payload: { x, y } });
+    }
+  }, [dispatch, revealed, flag, x, y]);
+
+  const handleRightClick = useCallback(
+    (event: MouseEvent) => {
+      event.preventDefault();
+      if (revealed) {
+        return;
+      }
+      dispatch({ type: "toggle_flag", payload: { x, y } });
+    },
+    [dispatch, revealed, x, y]
+  );
 
   return (
     <button
       key={tile.key}
       type="button"
       onClick={handleClick}
+      onContextMenu={handleRightClick}
       className={classNames(
         styles.tile,
         tile.revealed ? styles.revealed : styles.unrevealed
       )}
     >
-      <span className={styles.warning}>{adjacentMines}</span>
+      {tile.flag && <span>🚩</span>}
+      {tile.revealed && <span className={styles.warning}>{adjacentMines}</span>}
     </button>
   );
 }

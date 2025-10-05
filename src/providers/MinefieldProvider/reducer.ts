@@ -44,20 +44,30 @@ export function makeMinefieldState(
 
 export type MinefieldReducer = ActionDispatch<[action: MinefieldReducerAction]>;
 
-type MinefieldReducerAction = {
-  type: "reveal_tile";
-  payload: Vec2;
-};
+type MinefieldReducerAction =
+  | {
+      type: "reveal_tile";
+      payload: Vec2;
+    }
+  | {
+      type: "toggle_flag";
+      payload: Vec2;
+    };
 
 export function minefieldReducer(
   state0: MinefieldState,
   action: MinefieldReducerAction
-) {
+): MinefieldState {
   const state = copyState(state0);
   state.history.push(action);
   switch (action.type) {
     case "reveal_tile":
-      return handleRevealTile(state, action);
+      return handleRevealTile(state, action) || state0;
+    case "toggle_flag":
+      return handleToggleFlag(state, action) || state0;
+    default:
+      console.warn("No handler for dispatch:", action);
+      return state0;
   }
 }
 
@@ -78,16 +88,37 @@ function copyState(state0: MinefieldState) {
 type ActionHandler<T extends MinefieldReducerAction["type"]> = (
   state: MinefieldState,
   action: MinefieldReducerAction & { type: T }
-) => MinefieldState;
+) => MinefieldState | undefined;
 
 const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
   let [tile, index] = getTile(state.minefield, action.payload);
   if (!tile) {
-    throw Error("Can't reveal tile. It doesn't exist.");
+    throw Error("Tile doesn't exist.");
+  }
+  if (tile.flag) {
+    console.warn("Can't reveal a flagged tile.");
+    return;
   }
   tile = {
     ...tile,
     revealed: true,
+  };
+  state.minefield.tiles[index] = tile;
+  return state;
+};
+
+const handleToggleFlag: ActionHandler<"toggle_flag"> = (state, action) => {
+  let [tile, index] = getTile(state.minefield, action.payload);
+  if (!tile) {
+    throw Error("Tile doesn't exist.");
+  }
+  if (tile.revealed) {
+    console.warn("Can't flag a revealed tile.");
+    return;
+  }
+  tile = {
+    ...tile,
+    flag: !tile.flag,
   };
   state.minefield.tiles[index] = tile;
   return state;
