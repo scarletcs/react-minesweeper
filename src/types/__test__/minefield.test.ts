@@ -99,9 +99,9 @@ describe("getAdjacentTiles", () => {
     `finds the correct amount of adjacent tiles in a 3x3 minefield at position (%i, %i)`,
     (x, y, expected) => {
       const minefield = makeMinefield({ width: 3, height: 3, mineCount: 0 });
-      const tile = getTile(minefield, { x, y });
+      const tile = getTile(minefield, { x, y })!;
 
-      const adjacent = getAdjacentTiles(tile!, minefield);
+      const adjacent = getAdjacentTiles(minefield, tile);
 
       expect(adjacent.length).toEqual(expected);
     }

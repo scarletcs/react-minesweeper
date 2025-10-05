@@ -1,5 +1,6 @@
 import type { ActionDispatch } from "react";
 import {
+  getAdjacentTiles,
   getTile,
   makeMinefield,
   type Minefield,
@@ -96,16 +97,10 @@ type ActionHandler<T extends MinefieldReducerAction["type"]> = (
 ) => MinefieldState | undefined;
 
 const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
-  const tile = getTile(state.minefield, action.payload);
-  if (!tile) {
-    throw Error("Tile doesn't exist.");
-  }
-  if (tile.flag) {
-    console.warn("Can't reveal a flagged tile.");
-    return;
-  }
-  tile.revealed = true;
+  const position = action.payload;
+  revealTile(state.minefield, position);
   if (state.progress === GameProgress.Idle) {
+    revealAdjacentTiles(state.minefield, position);
     plantMines(state.minefield);
     state.progress = GameProgress.Started;
     state.initial = state.minefield;
@@ -113,6 +108,22 @@ const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
   // TODO flood fill adjacent safe squares
   return state;
 };
+
+function revealTile(minefield: Minefield, position: Vec2) {
+  const tile = getTile(minefield, position);
+  if (!tile) {
+    throw Error("Tile doesn't exist.");
+  }
+  tile.revealed = true;
+  tile.flag = false;
+}
+
+function revealAdjacentTiles(minefield: Minefield, position: Vec2) {
+  const tiles = getAdjacentTiles(minefield, position);
+  tiles.forEach((t) => {
+    revealTile(minefield, t);
+  });
+}
 
 function plantMines(minefield: Minefield) {
   const tiles = minefield.tiles.filter((t) => !t.revealed);

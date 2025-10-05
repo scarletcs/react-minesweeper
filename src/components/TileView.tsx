@@ -14,8 +14,8 @@ export default function TileView({ tile }: Props) {
 
   /** List of adjacent tiles */
   const adjacentTiles = useMemo(
-    () => getAdjacentTiles({ x, y }, minefield),
-    [x, y, minefield]
+    () => getAdjacentTiles(minefield, { x, y }),
+    [minefield, x, y]
   );
 
   /** Number of adjacent mines */

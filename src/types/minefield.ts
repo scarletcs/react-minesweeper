@@ -88,7 +88,7 @@ export function getTile(field: Minefield, coord: Vec2): Tile | undefined {
   return tile;
 }
 
-export function getAdjacentTiles(tile: Vec2, field: Minefield) {
+export function getAdjacentTiles(field: Minefield, tile: Vec2) {
   const found: Tile[] = [];
   for (const diff of ADJACENT_COORDS) {
     const adjacentCoord = {
