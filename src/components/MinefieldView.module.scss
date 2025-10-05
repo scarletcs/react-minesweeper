@@ -1,0 +1,7 @@
+.world {
+  --tile-size: 30px;
+  --minefield-width: 8;
+  display: grid;
+  grid-template-columns: repeat(var(--minefield-width), var(--tile-size));
+  grid-auto-rows: var(--tile-size);
+}
