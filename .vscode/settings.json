@@ -1,0 +1,11 @@
+{
+  "prettier.jsxSingleQuote": false,
+  "prettier.singleQuote": false,
+  "typescript.preferences.quoteStyle": "double",
+  "javascript.preferences.quoteStyle": "double",
+  "editor.formatOnSave": true,
+  "files.insertFinalNewline": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true
+}

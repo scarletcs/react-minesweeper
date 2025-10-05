@@ -50,13 +50,21 @@ export function indexToCoord(
   field: { width: number; height: number },
   index: number
 ): Vec2 {
+  if (index < 0 || index >= field.width * field.height) {
+    throw Error("Index is out of bounds for this minefield");
+  }
   const y = Math.floor(index / field.width);
   const x = index % field.width;
   return { x, y };
 }
 
 export function getTile(field: Minefield, coord: Vec2): Tile | undefined {
-  if (coord.x < 0 || coord.y < 0) {
+  if (
+    coord.x < 0 ||
+    coord.y < 0 ||
+    coord.x >= field.width ||
+    coord.y >= field.height
+  ) {
     return undefined;
   }
   const column = coord.y * field.width;
@@ -65,12 +73,28 @@ export function getTile(field: Minefield, coord: Vec2): Tile | undefined {
   return tile;
 }
 
+export function getAdjacentTiles(tile: Tile, field: Minefield) {
+  const found: Tile[] = [];
+  for (const diff of ADJACENT_COORDS) {
+    const adjacentCoord = {
+      x: tile.x + diff.x,
+      y: tile.y + diff.y,
+    };
+    const adjacent = getTile(field, adjacentCoord);
+    if (adjacent) {
+      found.push(adjacent);
+    }
+  }
+  return found;
+}
+
 export const ADJACENT_COORDS = [
   { x: -1, y: -1 },
   { x: -1, y: 0 },
   { x: -1, y: +1 },
 
   { x: 0, y: -1 },
+  // not 0, 0
   { x: 0, y: +1 },
 
   { x: +1, y: -1 },
