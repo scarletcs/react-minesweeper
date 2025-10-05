@@ -1,9 +1,16 @@
 import { type Vec2 } from "./vector";
 import { Random } from "../utils/random";
 
+export type MinefieldConfig = {
+  width: number;
+  height: number;
+  mineCount: number;
+};
+
 export type Minefield = {
   width: number;
   height: number;
+  mineCount: number;
   tiles: Tile[];
 };
 
@@ -32,7 +39,11 @@ function makeTile(overrides: Partial<Tile> & { x: number; y: number }): Tile {
   };
 }
 
-export function makeMinefield(width: number, height: number): Minefield {
+export function makeMinefield({
+  width,
+  height,
+  mineCount,
+}: MinefieldConfig): Minefield {
   const tiles = [];
   const tileCount = width * height;
   for (let index = 0; index < tileCount; index++) {
@@ -44,6 +55,7 @@ export function makeMinefield(width: number, height: number): Minefield {
   return {
     width,
     height,
+    mineCount,
     tiles,
   };
 }
@@ -60,23 +72,20 @@ export function indexToCoord(
   return { x, y };
 }
 
-export function getTile(
-  field: Minefield,
-  coord: Vec2
-): [Tile | undefined, number] {
+export function getTile(field: Minefield, coord: Vec2): Tile | undefined {
   if (
     coord.x < 0 ||
     coord.y < 0 ||
     coord.x >= field.width ||
     coord.y >= field.height
   ) {
-    return [undefined, -1];
+    return undefined;
   }
   const column = coord.y * field.width;
   const row = coord.x;
   const index = column + row;
   const tile = field.tiles[index];
-  return [tile, index];
+  return tile;
 }
 
 export function getAdjacentTiles(tile: Vec2, field: Minefield) {
@@ -86,7 +95,7 @@ export function getAdjacentTiles(tile: Vec2, field: Minefield) {
       x: tile.x + diff.x,
       y: tile.y + diff.y,
     };
-    const [adjacent] = getTile(field, adjacentCoord);
+    const adjacent = getTile(field, adjacentCoord);
     if (adjacent) {
       found.push(adjacent);
     }

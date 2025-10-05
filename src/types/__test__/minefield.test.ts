@@ -13,7 +13,7 @@ describe("makeMinefield", () => {
     [3, 5],
     [5, 4],
   ])("can make a minefield size %ix%i", (width, height) => {
-    const minefield = makeMinefield(width, height);
+    const minefield = makeMinefield({ width, height, mineCount: 0 });
 
     expect(minefield.width).toEqual(width);
     expect(minefield.height).toEqual(height);
@@ -74,9 +74,9 @@ describe("getTile", () => {
     [1, 2],
     [2, 2],
   ])(`can get a tile in a 3x3 minefield at (%i, %i)`, (x, y) => {
-    const minefield = makeMinefield(3, 3);
+    const minefield = makeMinefield({ width: 3, height: 3, mineCount: 0 });
 
-    const [tile] = getTile(minefield, { x, y });
+    const tile = getTile(minefield, { x, y });
 
     expect(tile).toBeDefined();
     expect(tile!.x).toEqual(x);
@@ -98,8 +98,8 @@ describe("getAdjacentTiles", () => {
   ])(
     `finds the correct amount of adjacent tiles in a 3x3 minefield at position (%i, %i)`,
     (x, y, expected) => {
-      const minefield = makeMinefield(3, 3);
-      const [tile] = getTile(minefield, { x, y });
+      const minefield = makeMinefield({ width: 3, height: 3, mineCount: 0 });
+      const tile = getTile(minefield, { x, y });
 
       const adjacent = getAdjacentTiles(tile!, minefield);
 

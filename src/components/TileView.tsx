@@ -10,7 +10,7 @@ type Props = {
 
 export default function TileView({ tile }: Props) {
   const [minefield, dispatch] = useMinefield();
-  const { x, y, revealed, flag } = tile;
+  const { x, y, revealed, flag, mine } = tile;
 
   /** List of adjacent tiles */
   const adjacentTiles = useMemo(
@@ -49,11 +49,15 @@ export default function TileView({ tile }: Props) {
       onContextMenu={handleRightClick}
       className={classNames(
         styles.tile,
-        tile.revealed ? styles.revealed : styles.unrevealed
+        revealed ? styles.revealed : styles.unrevealed
       )}
     >
-      {tile.flag && <span>🚩</span>}
-      {tile.revealed && <span className={styles.warning}>{adjacentMines}</span>}
+      {flag && <span>🚩</span>}
+      {revealed && adjacentMines > 0 && (
+        <span className={styles.warning}>{adjacentMines}</span>
+      )}
+      {/* for now, go with an x-ray view. always inform us if there's a mine here. */}
+      {mine && <span>💣</span>}
     </button>
   );
 }

@@ -5,16 +5,18 @@ import { makeMinefieldState, minefieldReducer } from "./reducer";
 type Props = PropsWithChildren & {
   width?: number;
   height?: number;
+  mineCount?: number;
 };
 
 export default function MinefieldProvider({
   children,
-  width = 3,
-  height = 3,
+  width = 8,
+  height = 8,
+  mineCount = 8,
 }: Props) {
   const [state, dispatch] = useReducer(
     minefieldReducer,
-    makeMinefieldState(width, height)
+    makeMinefieldState({ width, height, mineCount })
   );
 
   return (

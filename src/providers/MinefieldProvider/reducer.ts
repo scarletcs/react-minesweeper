@@ -1,6 +1,12 @@
 import type { ActionDispatch } from "react";
-import { getTile, makeMinefield, type Minefield } from "../../types/minefield";
+import {
+  getTile,
+  makeMinefield,
+  type Minefield,
+  type MinefieldConfig,
+} from "../../types/minefield";
 import type { Vec2 } from "../../types/vector";
+import { Random } from "../../utils/random";
 
 export type MinefieldState = {
   /**
@@ -29,11 +35,8 @@ const GameProgress = Object.freeze({
   Lose: "lose",
 });
 
-export function makeMinefieldState(
-  width: number,
-  height: number
-): MinefieldState {
-  const minefield = makeMinefield(width, height);
+export function makeMinefieldState(config: MinefieldConfig): MinefieldState {
+  const minefield = makeMinefield(config);
   return {
     minefield,
     initial: minefield,
@@ -59,7 +62,9 @@ export function minefieldReducer(
   action: MinefieldReducerAction
 ): MinefieldState {
   const state = copyState(state0);
-  state.history.push(action);
+  if (state.progress !== GameProgress.Idle) {
+    state.history.push(action);
+  }
   switch (action.type) {
     case "reveal_tile":
       return handleRevealTile(state, action) || state0;
@@ -91,7 +96,7 @@ type ActionHandler<T extends MinefieldReducerAction["type"]> = (
 ) => MinefieldState | undefined;
 
 const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
-  let [tile, index] = getTile(state.minefield, action.payload);
+  const tile = getTile(state.minefield, action.payload);
   if (!tile) {
     throw Error("Tile doesn't exist.");
   }
@@ -99,16 +104,26 @@ const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
     console.warn("Can't reveal a flagged tile.");
     return;
   }
-  tile = {
-    ...tile,
-    revealed: true,
-  };
-  state.minefield.tiles[index] = tile;
+  tile.revealed = true;
+  if (state.progress === GameProgress.Idle) {
+    plantMines(state.minefield);
+    state.progress = GameProgress.Started;
+    state.initial = state.minefield;
+  }
+  // TODO flood fill adjacent safe squares
   return state;
 };
 
+function plantMines(minefield: Minefield) {
+  const tiles = minefield.tiles.filter((t) => !t.revealed);
+  const shuffled = Random.shuffle(tiles);
+  shuffled.slice(0, minefield.mineCount).forEach((tile) => {
+    tile.mine = true;
+  });
+}
+
 const handleToggleFlag: ActionHandler<"toggle_flag"> = (state, action) => {
-  let [tile, index] = getTile(state.minefield, action.payload);
+  const tile = getTile(state.minefield, action.payload);
   if (!tile) {
     throw Error("Tile doesn't exist.");
   }
@@ -116,10 +131,6 @@ const handleToggleFlag: ActionHandler<"toggle_flag"> = (state, action) => {
     console.warn("Can't flag a revealed tile.");
     return;
   }
-  tile = {
-    ...tile,
-    flag: !tile.flag,
-  };
-  state.minefield.tiles[index] = tile;
+  tile.flag = !tile.flag;
   return state;
 };
