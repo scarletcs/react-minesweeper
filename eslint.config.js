@@ -25,5 +25,13 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    rules: {
+      "prefer-const": [
+        "error",
+        {
+          destructuring: "all",
+        },
+      ],
+    },
   },
 ]);

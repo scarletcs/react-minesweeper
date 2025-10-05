@@ -3,7 +3,7 @@ import { useMinefield } from "../providers/MinefieldProvider/context";
 import TileView from "./TileView";
 
 export default function MinefieldView() {
-  const minefield = useMinefield();
+  const [minefield] = useMinefield();
 
   return (
     <div

@@ -1,6 +1,6 @@
-import { useState, type PropsWithChildren } from "react";
-import { makeMinefield } from "../../types/minefield";
+import { useReducer, type PropsWithChildren } from "react";
 import { MinefieldContext } from "./context";
+import { makeMinefieldState, minefieldReducer } from "./reducer";
 
 type Props = PropsWithChildren & {
   width?: number;
@@ -12,13 +12,13 @@ export default function MinefieldProvider({
   width = 3,
   height = 3,
 }: Props) {
-  const [minefield] = useState(() => {
-    const minefield = makeMinefield(width, height);
-    return minefield;
-  });
+  const [state, dispatch] = useReducer(
+    minefieldReducer,
+    makeMinefieldState(width, height)
+  );
 
   return (
-    <MinefieldContext.Provider value={minefield}>
+    <MinefieldContext.Provider value={[state, dispatch]}>
       {children}
     </MinefieldContext.Provider>
   );

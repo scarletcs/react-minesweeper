@@ -58,19 +58,23 @@ export function indexToCoord(
   return { x, y };
 }
 
-export function getTile(field: Minefield, coord: Vec2): Tile | undefined {
+export function getTile(
+  field: Minefield,
+  coord: Vec2
+): [Tile | undefined, number] {
   if (
     coord.x < 0 ||
     coord.y < 0 ||
     coord.x >= field.width ||
     coord.y >= field.height
   ) {
-    return undefined;
+    return [undefined, -1];
   }
   const column = coord.y * field.width;
   const row = coord.x;
-  const tile = field.tiles[column + row];
-  return tile;
+  const index = column + row;
+  const tile = field.tiles[index];
+  return [tile, index];
 }
 
 export function getAdjacentTiles(tile: Tile, field: Minefield) {
@@ -80,7 +84,7 @@ export function getAdjacentTiles(tile: Tile, field: Minefield) {
       x: tile.x + diff.x,
       y: tile.y + diff.y,
     };
-    const adjacent = getTile(field, adjacentCoord);
+    const [adjacent] = getTile(field, adjacentCoord);
     if (adjacent) {
       found.push(adjacent);
     }

@@ -15,8 +15,8 @@ describe("makeMinefield", () => {
   ])("can make a minefield size %ix%i", (width, height) => {
     const minefield = makeMinefield(width, height);
 
-    expect(minefield.height).toEqual(height);
     expect(minefield.width).toEqual(width);
+    expect(minefield.height).toEqual(height);
     expect(minefield.tiles).toHaveLength(width * height);
 
     // all tiles have a correct coordinate in bounds
@@ -76,11 +76,11 @@ describe("getTile", () => {
   ])(`can get a tile in a 3x3 minefield at (%i, %i)`, (x, y) => {
     const minefield = makeMinefield(3, 3);
 
-    const tile = getTile(minefield, { x, y })!;
+    const [tile] = getTile(minefield, { x, y });
 
     expect(tile).toBeDefined();
-    expect(tile.x).toEqual(x);
-    expect(tile.y).toEqual(y);
+    expect(tile!.x).toEqual(x);
+    expect(tile!.y).toEqual(y);
   });
 });
 
@@ -99,9 +99,9 @@ describe("getAdjacentTiles", () => {
     `finds the correct amount of adjacent tiles in a 3x3 minefield at position (%i, %i)`,
     (x, y, expected) => {
       const minefield = makeMinefield(3, 3);
-      const tile = getTile(minefield, { x, y })!;
+      const [tile] = getTile(minefield, { x, y });
 
-      const adjacent = getAdjacentTiles(tile, minefield);
+      const adjacent = getAdjacentTiles(tile!, minefield);
 
       expect(adjacent.length).toEqual(expected);
     }
