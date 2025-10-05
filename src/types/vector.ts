@@ -17,5 +17,5 @@ export abstract class VectorMath {
 }
 
 export function stringifyVector(vec: Vec2) {
-  return `{x:${vec.x}, y:${vec.y}}`;
+  return `[Vector (${vec.x}, ${vec.y})]`;
 }

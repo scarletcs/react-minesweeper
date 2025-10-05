@@ -1,9 +1,12 @@
 import { MinefieldView } from "./components/MinefieldView";
+import { MinefieldProvider } from "./providers/MinefieldProvider/MinefieldProvider";
 
 function App() {
   return (
     <>
-      <MinefieldView />
+      <MinefieldProvider>
+        <MinefieldView />
+      </MinefieldProvider>
     </>
   );
 }

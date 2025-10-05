@@ -1,22 +1,24 @@
-import { VectorMath, type Vec2 } from "./vector";
+import { type Vec2 } from "./vector";
 import { Random } from "../utils/random";
 
-type Minefield = {
+export type Minefield = {
   width: number;
   height: number;
   tiles: Tile[];
 };
 
-type Tile = {
+export type Tile = {
   key: string;
+  x: number;
+  y: number;
   revealed: boolean;
   mine: boolean;
   flag: boolean;
   adjacentTiles: Tile[];
-  adjacentMines: string;
+  adjacentMines: number;
 };
 
-function makeTile(overrides: Partial<Tile> = {}) {
+function makeTile(overrides: Partial<Tile> & { x: number; y: number }): Tile {
   return {
     key: Random.uuid(),
     revealed: false,
@@ -28,11 +30,19 @@ function makeTile(overrides: Partial<Tile> = {}) {
   };
 }
 
-export function makeMinefield(width: number, height: number) {
+export function makeMinefield(width: number, height: number): Minefield {
+  const tiles = [];
+  const tileCount = width * height;
+  for (let index = 0; index < tileCount; index++) {
+    const coord = indexToCoord({ width, height }, index);
+    const tile = makeTile(coord);
+    tiles.push(tile);
+  }
+
   return {
     width,
     height,
-    tiles: new Array(width * height).fill(0).map(() => makeTile()),
+    tiles,
   };
 }
 
@@ -45,31 +55,24 @@ export function indexToCoord(
   return { x, y };
 }
 
-export function getTile(field: Minefield, coord: Vec2) {
-  const tile = field.tiles.at(coord.y * field.height + coord.x);
+export function getTile(field: Minefield, coord: Vec2): Tile | undefined {
+  if (coord.x < 0 || coord.y < 0) {
+    return undefined;
+  }
+  const column = coord.y * field.width;
+  const row = coord.x;
+  const tile = field.tiles[column + row];
   return tile;
 }
 
-export function assignNeighhbours(field: Minefield) {
-  field.tiles.forEach((tile, index) => {
-    const tileCoord = indexToCoord(field, index);
-    ADJACENT_COORDS.forEach((diff) => {
-      const adjacentCoord = VectorMath.add(tileCoord, diff);
-      const adjacentTile = getTile(field, adjacentCoord);
-      if (adjacentTile) {
-        tile.adjacentTiles.push(adjacentTile);
-      }
-    });
-  });
-}
-
-const ADJACENT_COORDS = [
+export const ADJACENT_COORDS = [
   { x: -1, y: -1 },
   { x: -1, y: 0 },
   { x: -1, y: +1 },
+
   { x: 0, y: -1 },
-  { x: 0, y: 0 },
   { x: 0, y: +1 },
+
   { x: +1, y: -1 },
   { x: +1, y: 0 },
   { x: +1, y: +1 },

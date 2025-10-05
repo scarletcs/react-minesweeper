@@ -1,10 +1,9 @@
-import { useState } from "react";
 import styles from "./MinefieldView.module.scss";
-import { indexToCoord, makeMinefield } from "../types/minefield";
-import { stringifyVector } from "../types/vector";
+import { useMinefield } from "../providers/MinefieldProvider/context";
+import { TileView } from "./TileView";
 
 export function MinefieldView() {
-  const [minefield] = useState(makeMinefield(10, 10));
+  const minefield = useMinefield();
 
   return (
     <div
@@ -14,12 +13,7 @@ export function MinefieldView() {
       data-height={minefield.height}
     >
       {minefield.tiles.map((tile, index) => (
-        <div
-          key={tile.key}
-          data-coord={stringifyVector(indexToCoord(minefield, index))}
-        >
-          {index}
-        </div>
+        <TileView key={tile.key} tile={tile} index={index} />
       ))}
     </div>
   );
