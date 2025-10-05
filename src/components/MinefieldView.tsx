@@ -1,8 +1,8 @@
 import styles from "./MinefieldView.module.scss";
 import { useMinefield } from "../providers/MinefieldProvider/context";
-import { TileView } from "./TileView";
+import TileView from "./TileView";
 
-export function MinefieldView() {
+export default function MinefieldView() {
   const minefield = useMinefield();
 
   return (
@@ -12,8 +12,8 @@ export function MinefieldView() {
       data-width={minefield.width}
       data-height={minefield.height}
     >
-      {minefield.tiles.map((tile, index) => (
-        <TileView key={tile.key} tile={tile} index={index} />
+      {minefield.tiles.map((tile) => (
+        <TileView key={tile.key} tile={tile} />
       ))}
     </div>
   );

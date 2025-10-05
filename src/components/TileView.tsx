@@ -1,24 +1,33 @@
+import { useMemo } from "react";
 import { useMinefield } from "../providers/MinefieldProvider/context";
-import { getAdjacentTiles, indexToCoord, type Tile } from "../types/minefield";
-import { stringifyVector } from "../types/vector";
+import { getAdjacentTiles, type Tile } from "../types/minefield";
+import styles from "./TileView.module.scss";
+import classNames from "classnames";
 
 type Props = {
   tile: Tile;
-  index: number;
 };
 
-export function TileView({ tile, index }: Props) {
+export default function TileView({ tile }: Props) {
   const minefield = useMinefield();
-  const adjacentTiles = getAdjacentTiles(tile, minefield);
+  const adjacentTiles = useMemo(
+    () => getAdjacentTiles(tile, minefield),
+    [tile, minefield]
+  );
+  const adjacentMines = useMemo(
+    () => adjacentTiles.filter((t) => t.mine).length,
+    [adjacentTiles]
+  );
 
   return (
     <div
       key={tile.key}
-      data-index={index}
-      data-adjacent-count={adjacentTiles.length}
-      data-coord={stringifyVector(indexToCoord(minefield, index))}
+      className={classNames(
+        styles.tile,
+        tile.revealed ? styles.revealed : styles.unrevealed
+      )}
     >
-      {index}
+      <span className={styles.warning}>{adjacentMines}</span>
     </div>
   );
 }

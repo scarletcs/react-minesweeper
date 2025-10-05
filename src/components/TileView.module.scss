@@ -1,0 +1,25 @@
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  user-select: none;
+}
+
+.unrevealed {
+  background: var(--unrevealed-bg);
+  border: var(--unrevealed-border);
+  border-color: var(--unrevealed-border-color);
+  cursor: pointer;
+}
+
+.revealed {
+  background: var(--revealed-bg);
+  border: var(--revealed-border);
+  border-color: var(--revealed-border-color);
+}
+
+.warning {
+  color: black;
+  font-weight: bold;
+}

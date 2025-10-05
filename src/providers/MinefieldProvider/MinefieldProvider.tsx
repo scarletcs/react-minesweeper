@@ -7,7 +7,11 @@ type Props = PropsWithChildren & {
   height?: number;
 };
 
-export function MinefieldProvider({ children, width = 3, height = 3 }: Props) {
+export default function MinefieldProvider({
+  children,
+  width = 3,
+  height = 3,
+}: Props) {
   const [minefield] = useState(() => {
     const minefield = makeMinefield(width, height);
     return minefield;

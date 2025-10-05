@@ -1,6 +1,13 @@
 .world {
   --tile-size: 30px;
   --minefield-width: 8;
+  --unrevealed-bg: #bcbcbc;
+  --unrevealed-border: 4px solid;
+  --unrevealed-border-color: #fdfdfd #606060 #606060 #fdfdfd;
+  --revealed-bg: #c1c1c1;
+  --revealed-border: 2px solid;
+  --revealed-border-color: #666666;
+
   display: grid;
   grid-template-columns: repeat(var(--minefield-width), var(--tile-size));
   grid-auto-rows: var(--tile-size);
