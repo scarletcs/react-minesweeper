@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
-import type { MinefieldReducer, MinefieldState } from "./reducer";
+import { GameProgress, type MinefieldState } from "./types";
 import type { Minefield } from "../../types/minefield";
+import type { MinefieldReducer } from "./reducer";
 
 export const MinefieldContext = createContext<
   [MinefieldState, MinefieldReducer] | undefined
@@ -17,4 +18,14 @@ export function useMinefieldCtx() {
 export function useMinefield() {
   const [state, reducer] = useMinefieldCtx();
   return [state.minefield, reducer] as [Minefield, MinefieldReducer];
+}
+
+export function useGameProgress() {
+  const [state] = useMinefieldCtx();
+  return state.progress;
+}
+
+export function useGameEnded() {
+  const progress = useGameProgress();
+  return progress === GameProgress.Win || progress === GameProgress.Lose;
 }

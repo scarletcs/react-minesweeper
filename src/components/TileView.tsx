@@ -1,5 +1,8 @@
 import { useCallback, useMemo, type MouseEvent } from "react";
-import { useMinefield } from "../providers/MinefieldProvider/context";
+import {
+  useGameEnded,
+  useMinefield,
+} from "../providers/MinefieldProvider/context";
 import { getAdjacentTiles, type Tile } from "../types/minefield";
 import styles from "./TileView.module.scss";
 import classNames from "classnames";
@@ -11,6 +14,7 @@ type Props = {
 export default function TileView({ tile }: Props) {
   const [minefield, dispatch] = useMinefield();
   const { x, y, revealed, flag, mine } = tile;
+  const gameEnded = useGameEnded();
 
   /** List of adjacent tiles */
   const adjacentTiles = useMemo(
@@ -41,6 +45,14 @@ export default function TileView({ tile }: Props) {
     [dispatch, revealed, x, y]
   );
 
+  const incorrect = useMemo(() => {
+    if (!gameEnded) {
+      return false;
+    }
+
+    return (revealed && mine) || (flag && !mine);
+  }, [gameEnded, flag, mine, revealed]);
+
   return (
     <button
       key={tile.key}
@@ -49,12 +61,13 @@ export default function TileView({ tile }: Props) {
       onContextMenu={handleRightClick}
       className={classNames(
         styles.tile,
-        revealed ? styles.revealed : styles.unrevealed
+        revealed ? styles.revealed : styles.unrevealed,
+        incorrect && styles.incorrect
       )}
     >
       {flag && <span>🚩</span>}
       {revealed && adjacentMines > 0 && (
-        <span className={styles.warning}>{adjacentMines}</span>
+        <span className={styles.text}>{adjacentMines}</span>
       )}
       {/* for now, go with an x-ray view. always inform us if there's a mine here. */}
       {mine && <span>💣</span>}

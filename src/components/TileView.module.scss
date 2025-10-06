@@ -19,7 +19,11 @@
   border-color: var(--revealed-border-color);
 }
 
-.warning {
+.incorrect {
+  background-color: rgb(180, 13, 13);
+}
+
+.text {
   color: black;
   font-weight: bold;
 }

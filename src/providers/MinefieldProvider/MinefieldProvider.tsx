@@ -1,6 +1,7 @@
 import { useReducer, type PropsWithChildren } from "react";
 import { MinefieldContext } from "./context";
-import { makeMinefieldState, minefieldReducer } from "./reducer";
+import { minefieldReducer } from "./reducer";
+import { makeMinefieldState } from "./types";
 
 type Props = PropsWithChildren & {
   width?: number;
