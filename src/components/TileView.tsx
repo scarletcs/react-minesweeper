@@ -1,20 +1,21 @@
 import { useCallback, useMemo, type MouseEvent } from "react";
-import {
-  useGameEnded,
-  useMinefield,
-} from "../providers/MinefieldProvider/context";
+import { useGameState } from "../providers/GameStateProvider/context";
 import { getAdjacentTiles, type Tile } from "../types/minefield";
 import styles from "./TileView.module.scss";
 import classNames from "classnames";
+import { GameProgress } from "../providers/GameStateProvider";
 
 type Props = {
   tile: Tile;
 };
 
 export default function TileView({ tile }: Props) {
-  const [minefield, dispatch] = useMinefield();
+  const [game, dispatch] = useGameState();
+  const { minefield, progress } = game;
   const { x, y, revealed, flag, mine } = tile;
-  const gameEnded = useGameEnded();
+  const gameStarted = progress !== GameProgress.Idle;
+  const gameEnded =
+    progress === GameProgress.Win || progress === GameProgress.Lose;
 
   /** List of adjacent tiles */
   const adjacentTiles = useMemo(
@@ -37,12 +38,12 @@ export default function TileView({ tile }: Props) {
   const handleRightClick = useCallback(
     (event: MouseEvent) => {
       event.preventDefault();
-      if (revealed) {
+      if (revealed || !gameStarted) {
         return;
       }
       dispatch({ type: "toggle_flag", payload: { x, y } });
     },
-    [dispatch, revealed, x, y]
+    [dispatch, gameStarted, revealed, x, y]
   );
 
   const incorrect = useMemo(() => {
@@ -57,6 +58,7 @@ export default function TileView({ tile }: Props) {
     <button
       key={tile.key}
       type="button"
+      disabled={gameEnded}
       onClick={handleClick}
       onContextMenu={handleRightClick}
       className={classNames(

@@ -1,9 +1,10 @@
 import styles from "./MinefieldView.module.scss";
-import { useMinefield } from "../providers/MinefieldProvider/context";
+import { useGameState } from "../providers/GameStateProvider/context";
 import TileView from "./TileView";
 
 export default function MinefieldView() {
-  const [minefield] = useMinefield();
+  const [game] = useGameState();
+  const { minefield } = game;
 
   return (
     <div

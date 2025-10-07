@@ -1,11 +1,7 @@
-import {
-  makeMinefield,
-  type Minefield,
-  type MinefieldConfig,
-} from "../../types/minefield";
-import type { MinefieldReducerAction } from "./reducer";
+import { type Minefield } from "../../types/minefield";
+import type { GameStateReducerAction } from "./reducer";
 
-export type MinefieldState = {
+export type GameState = {
   /**
    * The current minefield.
    */
@@ -20,9 +16,9 @@ export type MinefieldState = {
   progress: EnumValue<typeof GameProgress>;
   /**
    * The history of actions that have been performed on this minefield.
-   * Replay these over {@link MinefieldState.initial} to replay the game.
+   * Replay these over {@link GameState.initial} to replay the game.
    */
-  history: MinefieldReducerAction[];
+  history: GameStateReducerAction[];
 };
 
 export const GameProgress = Object.freeze({
@@ -32,8 +28,7 @@ export const GameProgress = Object.freeze({
   Lose: "lose",
 });
 
-export function makeMinefieldState(config: MinefieldConfig): MinefieldState {
-  const minefield = makeMinefield(config);
+export function makeGameState(minefield: Minefield): GameState {
   return {
     minefield,
     initial: minefield,

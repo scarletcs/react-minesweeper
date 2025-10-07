@@ -1,13 +1,13 @@
-import MinefieldView from "./components/MinefieldView";
-import MinefieldProvider from "./providers/MinefieldProvider/MinefieldProvider";
+import GameStateProvider from "./providers/GameStateProvider/GameStateProvider";
 import styles from "./App.module.scss";
+import GameView from "./components/GameView";
 
 export default function App() {
   return (
     <div className={styles.app}>
-      <MinefieldProvider>
-        <MinefieldView />
-      </MinefieldProvider>
+      <GameStateProvider>
+        <GameView />
+      </GameStateProvider>
     </div>
   );
 }

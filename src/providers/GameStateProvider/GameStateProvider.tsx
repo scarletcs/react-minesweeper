@@ -1,7 +1,8 @@
 import { useReducer, type PropsWithChildren } from "react";
-import { MinefieldContext } from "./context";
+import { GameStateContext } from "./context";
 import { minefieldReducer } from "./reducer";
-import { makeMinefieldState } from "./types";
+import { makeGameState } from "./types";
+import { makeMinefield } from "../../types/minefield";
 
 type Props = PropsWithChildren & {
   width?: number;
@@ -9,7 +10,7 @@ type Props = PropsWithChildren & {
   mineCount?: number;
 };
 
-export default function MinefieldProvider({
+export default function GameStateProvider({
   children,
   width = 8,
   height = 8,
@@ -17,12 +18,12 @@ export default function MinefieldProvider({
 }: Props) {
   const [state, dispatch] = useReducer(
     minefieldReducer,
-    makeMinefieldState({ width, height, mineCount })
+    makeGameState(makeMinefield({ width, height, mineCount }))
   );
 
   return (
-    <MinefieldContext.Provider value={[state, dispatch]}>
+    <GameStateContext.Provider value={[state, dispatch]}>
       {children}
-    </MinefieldContext.Provider>
+    </GameStateContext.Provider>
   );
 }
