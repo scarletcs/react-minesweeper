@@ -1,6 +1,6 @@
 import { useCallback, useMemo, type MouseEvent } from "react";
 import { useGameState } from "../providers/GameStateProvider/context";
-import { getAdjacentTiles, type Tile } from "../types/minefield";
+import { type Tile } from "../types/minefield";
 import styles from "./TileView.module.scss";
 import classNames from "classnames";
 import { GameProgress } from "../providers/GameStateProvider";
@@ -11,23 +11,11 @@ type Props = {
 
 export default function TileView({ tile }: Props) {
   const [game, dispatch] = useGameState();
-  const { minefield, progress } = game;
-  const { x, y, revealed, flag, mine } = tile;
+  const { progress } = game;
+  const { x, y, revealed, flag, mine, adjacentMines } = tile;
   const gameStarted = progress !== GameProgress.Idle;
   const gameEnded =
     progress === GameProgress.Win || progress === GameProgress.Lose;
-
-  /** List of adjacent tiles */
-  const adjacentTiles = useMemo(
-    () => getAdjacentTiles(minefield, { x, y }),
-    [minefield, x, y]
-  );
-
-  /** Number of adjacent mines */
-  const adjacentMines = useMemo(
-    () => adjacentTiles.filter((t) => t.mine).length,
-    [adjacentTiles]
-  );
 
   const handleClick = useCallback(() => {
     if (!revealed && !flag) {

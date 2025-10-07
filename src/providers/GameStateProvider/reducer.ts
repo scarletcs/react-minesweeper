@@ -84,7 +84,7 @@ const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
     state.progress = GameProgress.Win;
   }
 
-  // TODO flood fill adjacent safe squares
+  // floodReveal(minefield, tile);
 
   return state;
 };
@@ -94,6 +94,18 @@ function revealTile(tile: Tile) {
   tile.flag = false;
 }
 
+// function floodReveal(minefield: Minefield, origin: Tile) {
+//   // TODO
+// }
+
+/**
+ * Check if every safe tile (i.e. those without a mine) is revealed.
+ *
+ * This method doesn't care about flags, or whether mines are revaeled.
+ *
+ * @param minefield The minefield to examine.
+ * @returns True if all safe tiles are revealed.
+ */
 function isAllSafeTilesRevealed(minefield: Minefield) {
   for (const tile of minefield.tiles) {
     const safe = !tile.mine;
@@ -105,6 +117,14 @@ function isAllSafeTilesRevealed(minefield: Minefield) {
   return true;
 }
 
+/**
+ * Reveal every tile adjacent to a given position.
+ *
+ * This mutates the given minefield.
+ *
+ * @param minefield The minefield to operate on.
+ * @param position The position to reveal adjacent mines for.
+ */
 function revealAdjacentTiles(minefield: Minefield, position: Vec2) {
   const tiles = getAdjacentTiles(minefield, position);
   tiles.forEach((t) => {
@@ -112,12 +132,31 @@ function revealAdjacentTiles(minefield: Minefield, position: Vec2) {
   });
 }
 
+/**
+ * Plant mines in a minefield up to its expected {@link Minefield.mineCount mineCount}
+ *
+ * @param minefield The minefield to plant mines in.
+ */
 function plantMines(minefield: Minefield) {
   const tiles = minefield.tiles.filter((t) => !t.revealed);
   const shuffled = Random.shuffle(tiles);
   shuffled.slice(0, minefield.mineCount).forEach((tile) => {
-    tile.mine = true;
+    plantMine(minefield, tile);
   });
+}
+
+/**
+ * Plant a mine on a given tile.
+ *
+ * @param minefield The minefield to plant this mine in.
+ * @param tile The tile this mine is going on.
+ */
+function plantMine(minefield: Minefield, tile: Tile) {
+  tile.mine = true;
+  const adjacentTiles = getAdjacentTiles(minefield, tile);
+  for (const adjacent of adjacentTiles) {
+    adjacent.adjacentMines += 1;
+  }
 }
 
 const handleToggleFlag: ActionHandler<"toggle_flag"> = (state, action) => {
