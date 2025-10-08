@@ -69,11 +69,31 @@ function TileContent({ tile }: Props) {
   const gameEnded = progress === "win" || progress === "lose";
 
   if (flag) {
-    return <span>🚩</span>;
+    return (
+      <span
+        className={classNames(
+          "material-symbols-sharp",
+          styles.icon,
+          styles.flag
+        )}
+      >
+        flag_2
+      </span>
+    );
   }
 
   if (mine && (gameEnded || revealed)) {
-    return <span>💣</span>;
+    return (
+      <span
+        className={classNames(
+          "material-symbols-sharp",
+          styles.icon,
+          styles.bomb
+        )}
+      >
+        bomb
+      </span>
+    );
   }
 
   if (revealed && adjacentMines > 0) {
