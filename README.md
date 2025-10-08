@@ -11,6 +11,8 @@ This game works as an 8x8 grid with 12 mines. You can configure the size in code
 - Right click to plant or remove flags. Plant flags where there's mines to keep that square untouched.
 - If a numbered square has an equal number of flags adjacent to it, you can click that number to do a “force reveal” of tiles adjacent to it that you're sure are safe. (You did plant the flags in the right spot, didn't you?)
 
+<img alt="started" width="33%" src="https://github.com/scarletcs/react-minesweeper/blob/main/public/started.png"> <img alt="win" width="33%" src="https://github.com/scarletcs/react-minesweeper/blob/main/public/win.png"> <img alt="lose" width="33%" src="https://github.com/scarletcs/react-minesweeper/blob/main/public/lose.png">
+
 ## What I liked about making this
 
 I made this because I wanted to experiment with these things in particular:
