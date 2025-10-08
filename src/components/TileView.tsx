@@ -21,6 +21,10 @@ export default function TileView({ tile }: Props) {
     if (!revealed && !flag) {
       dispatch({ type: "reveal_tile", payload: { x, y } });
     }
+
+    if (revealed) {
+      dispatch({ type: "force_flood_reveal", payload: { x, y } });
+    }
   }, [dispatch, revealed, flag, x, y]);
 
   const handleRightClick = useCallback(

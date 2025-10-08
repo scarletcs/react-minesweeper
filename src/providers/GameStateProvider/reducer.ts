@@ -19,6 +19,10 @@ export type GameStateReducerAction =
   | {
       type: "toggle_flag";
       payload: Vec2;
+    }
+  | {
+      type: "force_flood_reveal";
+      payload: Vec2;
     };
 
 export function minefieldReducer(
@@ -34,6 +38,8 @@ export function minefieldReducer(
       return handleRevealTile(state, action) || state0;
     case "toggle_flag":
       return handleToggleFlag(state, action) || state0;
+    case "force_flood_reveal":
+      return handleForceFloodReveal(state, action) || state0;
     default:
       console.warn("No handler for dispatch:", action);
       return state0;
@@ -54,10 +60,15 @@ function copyState(state0: GameState) {
   return state;
 }
 
+/**
+ * An action handler for dispatched actions.
+ *
+ * A handler must return a new state, or return `false` if the operation is invalid and state should not be modified.
+ */
 type ActionHandler<T extends GameStateReducerAction["type"]> = (
   state: GameState,
   action: GameStateReducerAction & { type: T }
-) => GameState | undefined;
+) => GameState | false;
 
 const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
   const position = action.payload;
@@ -121,7 +132,9 @@ function floodReveal(minefield: Minefield, origin: Tile) {
     if (!tile) {
       break;
     }
-    const adjacentTiles = getAdjacentTiles(minefield, tile);
+    const adjacentTiles = getAdjacentTiles(minefield, tile).filter(
+      (t) => !t.flag
+    );
     for (const adjacent of adjacentTiles) {
       if (covered.has(adjacent.key)) {
         continue;
@@ -152,6 +165,16 @@ function isAllSafeTilesRevealed(minefield: Minefield) {
     }
   }
   return true;
+}
+
+/**
+ * Check if any mines are revealed.
+ *
+ * @param minefield The minefield to examine.
+ * @returns True if one or more mines are revealed.
+ */
+function isAnyMineRevealed(minefield: Minefield) {
+  return minefield.tiles.some((t) => t.mine && t.revealed);
 }
 
 /**
@@ -188,8 +211,33 @@ const handleToggleFlag: ActionHandler<"toggle_flag"> = (state, action) => {
   }
   if (tile.revealed) {
     console.warn("Can't flag a revealed tile.");
-    return;
+    return false;
   }
   tile.flag = !tile.flag;
   return state;
+};
+
+const handleForceFloodReveal: ActionHandler<"force_flood_reveal"> = (
+  state,
+  action
+) => {
+  const { minefield } = state;
+  const tile = getTile(minefield, action.payload);
+  if (!tile) {
+    throw Error("Tile doesn't exist.");
+  }
+
+  // This might be an attempt to do a force reveal.
+  const adjacentFlags = getAdjacentTiles(minefield, tile).filter(
+    (t) => t.flag
+  ).length;
+  if (adjacentFlags === tile.adjacentMines) {
+    floodReveal(minefield, tile);
+    if (isAnyMineRevealed(minefield)) {
+      state.progress = GameProgress.Lose;
+    }
+    return state;
+  } else {
+    return false;
+  }
 };
