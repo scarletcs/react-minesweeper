@@ -7,7 +7,7 @@ import {
 } from "../../types/minefield";
 import type { Vec2 } from "../../types/vector";
 import { Random } from "../../utils/random";
-import { GameProgress, type GameState as GameState } from "./types";
+import { type GameState as GameState } from "./types";
 
 export type GameStateReducer = ActionDispatch<[action: GameStateReducerAction]>;
 
@@ -44,7 +44,7 @@ export function minefieldReducer(
   action: GameStateReducerAction
 ): GameState {
   const state = copyState(state0);
-  if (state.progress !== GameProgress.Idle) {
+  if (state.progress !== "idle") {
     state.history.push(action);
   }
   switch (action.type) {
@@ -94,19 +94,19 @@ const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
 
   revealTile(tile);
 
-  if (state.progress === GameProgress.Idle) {
+  if (state.progress === "idle") {
     getAdjacentTiles(minefield, position).forEach((t) => revealTile(t));
     plantMines(minefield);
-    state.progress = GameProgress.Started;
+    state.progress = "started";
     state.initial = minefield;
   }
 
   if (tile.mine) {
-    state.progress = GameProgress.Lose;
+    state.progress = "lose";
   }
 
   if (isAllSafeTilesRevealed(minefield)) {
-    state.progress = GameProgress.Win;
+    state.progress = "win";
   }
 
   if (tile.adjacentMines === 0) {
@@ -247,7 +247,7 @@ const handleForceFloodReveal: ActionHandler<"force_flood_reveal"> = (
   if (adjacentFlags === tile.adjacentMines) {
     floodReveal(minefield, tile);
     if (isAnyMineRevealed(minefield)) {
-      state.progress = GameProgress.Lose;
+      state.progress = "lose";
     }
     return state;
   } else {

@@ -3,7 +3,6 @@ import { useGameState } from "../providers/GameStateProvider/context";
 import { type Tile } from "../types/minefield";
 import styles from "./TileView.module.scss";
 import classNames from "classnames";
-import { GameProgress } from "../providers/GameStateProvider";
 
 type Props = {
   tile: Tile;
@@ -13,9 +12,8 @@ export default function TileView({ tile }: Props) {
   const [game, dispatch] = useGameState();
   const { progress } = game;
   const { x, y, revealed, flag, mine, adjacentMines } = tile;
-  const gameStarted = progress !== GameProgress.Idle;
-  const gameEnded =
-    progress === GameProgress.Win || progress === GameProgress.Lose;
+  const gameStarted = progress !== "idle";
+  const gameEnded = progress === "win" || progress === "lose";
 
   const handleClick = useCallback(() => {
     if (!revealed && !flag) {
