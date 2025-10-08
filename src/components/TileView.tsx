@@ -61,8 +61,7 @@ export default function TileView({ tile }: Props) {
       {revealed && adjacentMines > 0 && (
         <span className={styles.text}>{adjacentMines}</span>
       )}
-      {/* for now, go with an x-ray view. always inform us if there's a mine here. */}
-      {mine && <span>💣</span>}
+      {mine && (gameEnded || revealed) && <span>💣</span>}
     </button>
   );
 }
