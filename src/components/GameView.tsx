@@ -3,6 +3,7 @@ import { useGameState } from "../providers/GameStateProvider";
 import styles from "./GameView.module.scss";
 import MinefieldView from "./MinefieldView";
 import GameClock from "./GameClock";
+import { UndoButton } from "./UndoButton";
 
 export default function GameView() {
   const [game] = useGameState();
@@ -25,6 +26,9 @@ export default function GameView() {
       </div>
       <div className={styles.board}>
         <MinefieldView />
+      </div>
+      <div className={styles.statusBar}>
+        <UndoButton />
       </div>
     </div>
   );

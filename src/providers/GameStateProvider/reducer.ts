@@ -37,6 +37,10 @@ export type GameStateReducerAction =
        */
       type: "force_flood_reveal";
       payload: Vec2;
+    }
+  | {
+      /** Undo the last game action. */
+      type: "undo";
     };
 
 export function minefieldReducer(
@@ -44,19 +48,29 @@ export function minefieldReducer(
   action: GameStateReducerAction
 ): GameState {
   const state = copyState(state0);
-  if (state.progress !== "idle") {
+  const result = applyAction(state, action);
+
+  const addToHistory = result.addToHistory ?? true;
+  const valid = result.valid ?? true;
+  if (valid && addToHistory) {
     state.history.push(action);
   }
+  return valid ? state : state0;
+}
+
+function applyAction(state: GameState, action: GameStateReducerAction) {
   switch (action.type) {
     case "reveal_tile":
-      return handleRevealTile(state, action) || state0;
+      return handleRevealTile(state, action);
     case "toggle_flag":
-      return handleToggleFlag(state, action) || state0;
+      return handleToggleFlag(state, action);
     case "force_flood_reveal":
-      return handleForceFloodReveal(state, action) || state0;
+      return handleForceFloodReveal(state, action);
+    case "undo":
+      return handleUndo(state, action);
     default:
       console.warn("No handler for dispatch:", action);
-      return state0;
+      return { state, valid: false };
   }
 }
 
@@ -82,9 +96,10 @@ function copyState(state0: GameState) {
 type ActionHandler<T extends GameStateReducerAction["type"]> = (
   state: GameState,
   action: GameStateReducerAction & { type: T }
-) => GameState | false;
+) => { state: GameState; valid?: boolean; addToHistory?: boolean };
 
 const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
+  let addToHistory = true;
   const position = action.payload;
   const { minefield } = state;
   const tile = getTile(minefield, position);
@@ -95,6 +110,7 @@ const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
   revealTile(tile);
 
   if (state.progress === "idle") {
+    addToHistory = false;
     getAdjacentTiles(minefield, position).forEach((t) => revealTile(t));
     plantMines(minefield);
     state.progress = "started";
@@ -113,7 +129,7 @@ const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
     floodReveal(minefield, tile);
   }
 
-  return state;
+  return { state, addToHistory };
 };
 
 /**
@@ -225,10 +241,10 @@ const handleToggleFlag: ActionHandler<"toggle_flag"> = (state, action) => {
   }
   if (tile.revealed) {
     console.warn("Can't flag a revealed tile.");
-    return false;
+    return { state, valid: false };
   }
   tile.flag = !tile.flag;
-  return state;
+  return { state };
 };
 
 const handleForceFloodReveal: ActionHandler<"force_flood_reveal"> = (
@@ -249,8 +265,27 @@ const handleForceFloodReveal: ActionHandler<"force_flood_reveal"> = (
     if (isAnyMineRevealed(minefield)) {
       state.progress = "lose";
     }
-    return state;
+    return { state };
   } else {
-    return false;
+    return { state, valid: false };
   }
+};
+
+const handleUndo: ActionHandler<"undo"> = (state, _action) => {
+  console.log("Beginning undo: fast forwarding over history");
+  console.log("Original history length:", history.length);
+  console.log("Original history:", history);
+  state.minefield = state.initial;
+  state.history.pop();
+
+  for (const act of state.history) {
+    console.log("Replaying", act.type);
+    const next = applyAction(state, act);
+    state = next.state;
+  }
+
+  console.log("Returning new history length:", state.history);
+  console.log("Returning new history:", state.history);
+
+  return { state, addToHistory: false };
 };

@@ -32,6 +32,7 @@ export default defineConfig([
           destructuring: "all",
         },
       ],
+      "@typescript-eslint/no-unused": ["error", { argsIgnorePattern: "^_" }],
     },
   },
 ]);
