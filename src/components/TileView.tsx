@@ -73,7 +73,7 @@ function TileContent({ tile }: Props) {
   }
 
   if (mine && (gameEnded || revealed)) {
-    <span>💣</span>;
+    return <span>💣</span>;
   }
 
   if (revealed && adjacentMines > 0) {
