@@ -101,16 +101,14 @@ const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
     state.initial = minefield;
   }
 
-  if (tile.mine) {
-    state.progress = "lose";
-  }
-
-  if (isAllSafeTilesRevealed(minefield)) {
-    state.progress = "win";
-  }
-
   if (tile.adjacentMines === 0) {
     floodReveal(minefield, tile);
+  }
+
+  if (tile.mine) {
+    state.progress = "lose";
+  } else if (isAllSafeTilesRevealed(minefield)) {
+    state.progress = "win";
   }
 
   return state;
@@ -248,6 +246,8 @@ const handleForceFloodReveal: ActionHandler<"force_flood_reveal"> = (
     floodReveal(minefield, tile);
     if (isAnyMineRevealed(minefield)) {
       state.progress = "lose";
+    } else if (isAllSafeTilesRevealed(minefield)) {
+      state.progress = "win";
     }
     return state;
   } else {
