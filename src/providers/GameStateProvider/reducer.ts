@@ -13,14 +13,28 @@ export type GameStateReducer = ActionDispatch<[action: GameStateReducerAction]>;
 
 export type GameStateReducerAction =
   | {
+      /**
+       * Reveal a tile.
+       *
+       * This action can have numerous side effects: win the game, lose the game, flood reveal adjacent safe tiles.
+       */
       type: "reveal_tile";
       payload: Vec2;
     }
   | {
+      /**
+       * Add a flag to this tile, or remove the flag currently there.
+       */
       type: "toggle_flag";
       payload: Vec2;
     }
   | {
+      /**
+       * A force reveal is an attempt to reveal all tiles around a revealed, numbered tile.
+       *
+       * This is only allowed if you've planted enough flags around the numbered tile to equal its adjacent mine count.
+       * Of course, if you planted your flags wrong, you may reveal a mine.
+       */
       type: "force_flood_reveal";
       payload: Vec2;
     };
@@ -227,7 +241,6 @@ const handleForceFloodReveal: ActionHandler<"force_flood_reveal"> = (
     throw Error("Tile doesn't exist.");
   }
 
-  // This might be an attempt to do a force reveal.
   const adjacentFlags = getAdjacentTiles(minefield, tile).filter(
     (t) => t.flag
   ).length;
