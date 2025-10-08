@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useGameState } from "../providers/GameStateProvider";
 import styles from "./GameView.module.scss";
 import MinefieldView from "./MinefieldView";
+import GameClock from "./GameClock";
 
 export default function GameView() {
   const [game] = useGameState();
@@ -14,7 +15,9 @@ export default function GameView() {
   return (
     <div className={styles.game}>
       <div className={styles.statusBar}>
-        <div>00:00</div>
+        <div>
+          <GameClock />
+        </div>
         <div>{progress}</div>
         <div>
           {flags} / {totalMines}
