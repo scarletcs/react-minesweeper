@@ -116,15 +116,6 @@ function floodReveal(minefield: Minefield, origin: Tile) {
     revealTile(origin);
   }
 
-  // For each tile in toReveal,
-  // pop that tile.
-  // Get its adjacent tiles.
-  // Reveal those adjacent tiles.
-  // For each of those tiles,
-  // if it has 0 adjacent mines and its key is not in `covered`,
-  // put it in `toReveal` and add its key to `covered`.
-  // Do this util `toReveal` is empty.
-
   while (toReveal.length > 0) {
     const tile = toReveal.pop();
     if (!tile) {
