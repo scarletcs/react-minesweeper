@@ -11,7 +11,7 @@ type Props = {
 export default function TileView({ tile }: Props) {
   const [game, dispatch] = useGameState();
   const { progress } = game;
-  const { x, y, revealed, flag, mine, adjacentMines } = tile;
+  const { x, y, revealed, flag, mine } = tile;
   const gameStarted = progress !== "idle";
   const gameEnded = progress === "win" || progress === "lose";
 
@@ -57,11 +57,31 @@ export default function TileView({ tile }: Props) {
         incorrect && styles.incorrect
       )}
     >
-      {flag && <span>🚩</span>}
-      {revealed && adjacentMines > 0 && (
-        <span className={styles.text}>{adjacentMines}</span>
-      )}
-      {mine && (gameEnded || revealed) && <span>💣</span>}
+      <TileContent tile={tile} />
     </button>
   );
+}
+
+function TileContent({ tile }: Props) {
+  const [game] = useGameState();
+  const { revealed, flag, mine, adjacentMines } = tile;
+  const { progress } = game;
+  const gameEnded = progress === "win" || progress === "lose";
+
+  if (flag) {
+    return <span>🚩</span>;
+  }
+
+  if (mine && (gameEnded || revealed)) {
+    <span>💣</span>;
+  }
+
+  if (revealed && adjacentMines > 0) {
+    return (
+      <span className={styles.text} data-adjacent-mines={adjacentMines}>
+        {adjacentMines}
+      </span>
+    );
+  }
+  return <></>;
 }

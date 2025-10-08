@@ -26,4 +26,29 @@
 .text {
   color: black;
   font-weight: bold;
+
+  &[data-adjacent-mines="1"] {
+    color: var(--mine-color-1);
+  }
+  &[data-adjacent-mines="2"] {
+    color: var(--mine-color-2);
+  }
+  &[data-adjacent-mines="3"] {
+    color: var(--mine-color-3);
+  }
+  &[data-adjacent-mines="4"] {
+    color: var(--mine-color-4);
+  }
+  &[data-adjacent-mines="5"] {
+    color: var(--mine-color-5);
+  }
+  &[data-adjacent-mines="6"] {
+    color: var(--mine-color-6);
+  }
+  &[data-adjacent-mines="7"] {
+    color: var(--mine-color-7);
+  }
+  &[data-adjacent-mines="8"] {
+    color: var(--mine-color-8);
+  }
 }

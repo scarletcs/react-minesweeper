@@ -14,7 +14,7 @@ export default function GameStateProvider({
   children,
   width = 8,
   height = 8,
-  mineCount = 8,
+  mineCount = 12,
 }: Props) {
   const [state, dispatch] = useReducer(
     minefieldReducer,
