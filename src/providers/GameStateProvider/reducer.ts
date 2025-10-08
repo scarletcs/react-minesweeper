@@ -70,7 +70,7 @@ const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
   revealTile(tile);
 
   if (state.progress === GameProgress.Idle) {
-    revealAdjacentTiles(minefield, position);
+    getAdjacentTiles(minefield, position).forEach((t) => revealTile(t));
     plantMines(minefield);
     state.progress = GameProgress.Started;
     state.initial = minefield;
@@ -84,19 +84,65 @@ const handleRevealTile: ActionHandler<"reveal_tile"> = (state, action) => {
     state.progress = GameProgress.Win;
   }
 
-  // floodReveal(minefield, tile);
+  if (tile.adjacentMines === 0) {
+    floodReveal(minefield, tile);
+  }
 
   return state;
 };
 
+/**
+ * Reveal a tile.
+ *
+ * @param tile The tile to reveal.
+ */
 function revealTile(tile: Tile) {
   tile.revealed = true;
   tile.flag = false;
 }
 
-// function floodReveal(minefield: Minefield, origin: Tile) {
-//   // TODO
-// }
+/**
+ * Perform a flood reveal extending from an origin tile.
+ *
+ * This mutates many tiles in the minefield.
+ *
+ * @param minefield The minefield to operate in.
+ * @param origin The origin to start flood filling.
+ */
+function floodReveal(minefield: Minefield, origin: Tile) {
+  const toReveal = [origin];
+  const covered = new Set<string>([origin.key]);
+  if (!origin.revealed) {
+    revealTile(origin);
+  }
+
+  // For each tile in toReveal,
+  // pop that tile.
+  // Get its adjacent tiles.
+  // Reveal those adjacent tiles.
+  // For each of those tiles,
+  // if it has 0 adjacent mines and its key is not in `covered`,
+  // put it in `toReveal` and add its key to `covered`.
+  // Do this util `toReveal` is empty.
+
+  while (toReveal.length > 0) {
+    const tile = toReveal.pop();
+    if (!tile) {
+      break;
+    }
+    const adjacentTiles = getAdjacentTiles(minefield, tile);
+    for (const adjacent of adjacentTiles) {
+      if (covered.has(adjacent.key)) {
+        continue;
+      }
+      revealTile(adjacent);
+      if (adjacent.adjacentMines === 0) {
+        covered.add(adjacent.key);
+        toReveal.push(adjacent);
+      }
+    }
+  }
+}
 
 /**
  * Check if every safe tile (i.e. those without a mine) is revealed.
@@ -115,21 +161,6 @@ function isAllSafeTilesRevealed(minefield: Minefield) {
     }
   }
   return true;
-}
-
-/**
- * Reveal every tile adjacent to a given position.
- *
- * This mutates the given minefield.
- *
- * @param minefield The minefield to operate on.
- * @param position The position to reveal adjacent mines for.
- */
-function revealAdjacentTiles(minefield: Minefield, position: Vec2) {
-  const tiles = getAdjacentTiles(minefield, position);
-  tiles.forEach((t) => {
-    revealTile(t);
-  });
 }
 
 /**
